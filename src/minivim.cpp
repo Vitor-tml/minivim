@@ -129,6 +129,15 @@ void Minivim::input(int c)
             x = 0;
             down();
             break;
+        case KEY_BTAB:
+        case KEY_CTAB:
+        case KEY_STAB:
+        case KEY_CATAB:
+        case 9:
+            lines[y].insert(x, 2, ' ');
+            x += 2;
+            break;
+
         default:
             lines[y].insert(x, 1, c);
             ++x;
