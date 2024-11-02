@@ -1,40 +1,40 @@
-#include <ftxui/component/component.hpp>  // for Button, Renderer, CatchEvent, etc.
+#include <ftxui/component/component.hpp>  // for Button, Renderer, Input, Container
 #include <ftxui/component/screen_interactive.hpp>  // for ScreenInteractive
 #include <ftxui/dom/elements.hpp>  // for text, Element, hbox, vbox, border
 #include <ftxui/screen/color.hpp>  // for Color
-
+#include <iostream>
 int main() {
     using namespace ftxui;
-    
-    // Variáveis para armazenar o estado
-    bool checked = false;
 
-    // Cria um botão
-    auto button = Button(L"Click me", [] { std::cout << "Button clicked!\n"; });
+    // Variável para armazenar o texto digitado pelo usuário
+    std::string input_text;
 
-    // Cria uma checkbox
-    auto checkbox = Checkbox(L"Option", &checked);
+    // Cria um componente Input para capturar a entrada de texto
+    auto input = Input(&input_text, L"Enter text...");
 
-    // Combina elementos em um layout vertical
-    auto component = Renderer(
-        Container::Vertical({
-            button,
-            checkbox
-        }),
-        [&] {
-            return vbox({
-                text(L"Hello, FTXUI!") | border,
-                separator(),
-                button->Render(),
-                separator(),
-                checkbox->Render() | border,
-            });
-        }
-    );
+    // Cria um botão que, ao ser clicado, imprime o texto digitado
+    auto button = Button(L"Print Text", [&] {
+        std::cout << "Input text: " << input_text << std::endl;
+    });
 
-    // Cria uma tela interativa
+    // Cria um container vertical para organizar os componentes
+    auto component = Container::Vertical({
+        input,
+        button
+    });
+
+    // Define o layout e a renderização dos componentes
+    auto renderer = Renderer(component, [&] {
+        return vbox({
+            text(L"Please enter some text:") | border,
+            input->Render() | border,
+            button->Render() | border,
+        });
+    });
+
+    // Cria uma tela interativa e inicia o loop de eventos
     auto screen = ScreenInteractive::FitComponent();
-    screen.Loop(component);
+    screen.Loop(renderer);
 
     return 0;
 }

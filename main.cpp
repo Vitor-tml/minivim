@@ -1,4 +1,4 @@
-#include <ftxui/component/screen_interactive.hpp> 
+#include <ftxui/component/screen_interactive.hpp> // screens (interativa, relativa, etc)
 #include <ftxui/component/component.hpp>          // button, renderer, event
 #include <ftxui/dom/elements.hpp>                 // text, elements, hbox, etc
 #include <ftxui/screen/color.hpp>                 // cores
@@ -9,21 +9,30 @@ int main()
 {
     const std::string hello = {"Olá, Mundo!"};
 
+    std::string entrada;
+    auto input = ftxui::Input(&entrada, L"Escreva aqui: ");
     // Elemento básico
     ftxui::Element doc = ftxui::hbox (
         ftxui::text(hello) | ftxui::border
     );
 
-    // Objeto da tela
-    ftxui::Screen tela = ftxui::Screen::Create(
-        ftxui::Dimension::Fixed(hello.length() + 1),
-        ftxui::Dimension::Fixed(3)
+    ftxui::Component componente = ftxui::Container::Vertical({
+        input
+    });
+
+    auto renderer = ftxui::Renderer(componente, [&] {
+        return ftxui::vbox({
+            doc,
+            ftxui::separator(),
+            input->Render() | ftxui::border,
+        });
+    }
     );
 
-    // Renderização e atualização da tela
-    ftxui::Render(tela, doc);
-    tela.Print();
 
-    std::cout << '\n';
+    // Objeto da tela
+    ftxui::ScreenInteractive tela = ftxui::ScreenInteractive::Fullscreen();
+    tela.Loop(renderer);
+
     return 0;    
 }
