@@ -10,9 +10,14 @@ private:
     FileManager *gArquivos;
     std::fstream *file;
     std::vector<std::string> lines;
-    int x, y;
+    size_t x, y;
     char mode;
     std::string status;
+
+    void m_remove(int);
+    std::string m_tabs(std::string &);
+    void m_insert(std::string, int);
+    void m_append(std::string&);
 public:
     Minivim(std::string&);
     ~Minivim();
@@ -22,4 +27,9 @@ protected:
     void statusLine();
     void input(int);
     void print();
+
+    void up();
+    void left();
+    void right();
+    void down();
 };
