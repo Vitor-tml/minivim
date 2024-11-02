@@ -21,4 +21,5 @@ protected:
     void update();
     void statusLine();
     void input(int);
+    void print();
 };

@@ -34,6 +34,7 @@ void Minivim::run(){
         statusLine();
         int c = getch();
         input(c);
+        print();
     }
 }
 
@@ -56,7 +57,7 @@ void Minivim::update()
 void Minivim::statusLine()
 {
     attron(A_REVERSE);
-    mvprintw(LINES - 1, 0, status.c_str());
+    mvprintw((int)LINES - 1, 0, status.c_str());
     attroff(A_REVERSE);
 }
 
@@ -68,12 +69,11 @@ void Minivim::input(int c)
     case 'n':
         switch (c)
         {
-        case 27:
-        case 'n':
-            mode = 'n';
-            break;
         case 'i':
             mode = 'i';
+            break;
+        case 'q':
+            mode = 'q';
             break;
         }
         break;
@@ -85,15 +85,27 @@ void Minivim::input(int c)
             mode = 'n';
             break;
         default:
-            std::string s(1, c);
-            lines.push_back(s);
+            lines[y].insert(x, 1, c);
+            ++x;
         }
-        break;   
-    case 'q':
         break;
     };
 
     for(size_t i {}; i < lines.size(); ++i){
         mvprintw(0, i, lines[i].c_str());
     }
+}
+
+void Minivim::print()
+{
+    for(size_t i{}; i < (size_t)LINES - 1; ++i){
+        if(i >= lines.size()){
+            move(i, 0);
+            clrtoeol();
+        }else {
+            mvprintw(i, 0, lines[i].c_str());
+            clrtoeol();
+        }
+    }
+    move(y, x);
 }
