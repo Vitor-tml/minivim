@@ -117,7 +117,7 @@ void Minivim::input(int c)
                 lines[y].erase(x, 1);
             }
             break;
-        case KEY_ENTER:
+        case KEY_ENTER: // Algum problema aqui com memória, refazer toda essa lógica
         case 10:
             if( x < lines[y].length()){
                 m_insert(lines[y].substr(x, lines[y].length() - x), y + 1);
