@@ -1,7 +1,9 @@
 #include "minivim.hpp"
-#define UNTITLENAME "untitled.gli"
+
 
 Minivim::Minivim(std::string &f){
+    gArquivos = FileManager::getInstance();
+
     initscr();
     noecho();
     cbreak();
@@ -11,18 +13,10 @@ Minivim::Minivim(std::string &f){
     mode = 'n';
     status = "NORMAL";
     section = "";
-    gArquivos = FileManager::getInstance();
     filename = f;
-    if(filename.empty())
-    {
-        filename = UNTITLENAME; 
-    }
-    
 
     gArquivos->loadFile(filename);
     file = gArquivos->getFile(filename);
-
-    lines.push_back("");
 }
 
 Minivim::~Minivim()
@@ -109,13 +103,16 @@ void Minivim::input(int c)
         case 'q':
             mode = 'q';
             break;
+        case 'w':
+            saveBuffer(filename);
+            break;
         }
         break;
     case 'i':
         switch (c)
         {
         case 27:
-        case 'n':
+        // case 'n':
             mode = 'n';
             break;
         case 127:
@@ -238,4 +235,51 @@ void Minivim::down()
         x = lines[y].length();
     }
     move(y, x);
+}
+
+void Minivim::loadBuffer(std::string id)
+{
+    std::fstream *arquivo = gArquivos->getFile(id);
+    if(arquivo->is_open()){
+        while(!arquivo->eof()){
+            std::string buffer;
+            std::getline(*arquivo, buffer);
+            m_append(buffer);
+        }
+    }else{
+        std::cout << "MiniVim::loadBuffer::Erro ao abrir arquivo!\n";
+    }
+}
+
+void Minivim::saveBuffer(std::string id)
+{
+    // Obtenha um ponteiro para o arquivo
+    std::fstream *arquivo = gArquivos->getFile(id);
+
+    if (arquivo) {
+        // Verifique se o arquivo já está aberto
+        if (arquivo->is_open()) {
+            // Feche o arquivo
+            arquivo->close();
+        }
+
+        // Reabra o arquivo em modo de saída (output) e truncamento
+        arquivo->open(id, std::ios::out | std::ios::trunc);
+
+        // Verifique se o arquivo foi aberto corretamente
+        if (arquivo->is_open()) {
+            // Percorra as linhas e salve no arquivo
+            for (size_t i = 0; i < lines.size(); ++i) {
+                *arquivo << lines[i] << '\n';   // Escreva a linha no arquivo com quebra de linha
+            }
+            // Feche o arquivo após a escrita
+            arquivo->close();
+        } else {
+            // Erro ao abrir o arquivo
+            std::cout << "MiniVim::saveBuffer:: Erro ao abrir o arquivo para escrita!\n";
+        }
+    } else {
+        // Erro ao obter o ponteiro do arquivo
+        std::cout << "MiniVim::saveBuffer:: Erro ao acessar o arquivo!\n";
+    }
 }

@@ -3,6 +3,8 @@
 #include <string>
 #include <fstream>
 #include <unordered_map>
+#include <vector>
+#include <string>
 
 class FileManager {
 private:
@@ -16,5 +18,5 @@ private:
 public:
     static FileManager* getInstance();
     void loadFile(const std::string&);
-    std::fstream* getFile(const std::string&);    
+    std::fstream* getFile(const std::string&);
 };

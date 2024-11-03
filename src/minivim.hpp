@@ -22,6 +22,8 @@ public:
     Minivim(std::string&);
     ~Minivim();
     void run();
+    void loadBuffer(std::string);
+    void saveBuffer(std::string);
 protected:
     void update();
     void statusLine();
@@ -32,4 +34,5 @@ protected:
     void left();
     void right();
     void down();
+
 };

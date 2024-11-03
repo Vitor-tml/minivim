@@ -25,7 +25,7 @@ FileManager* FileManager::getInstance()
 void FileManager::loadFile(const std::string& filename) 
 {
     std::fstream *novoArquivo = new std::fstream(filename, std::ios::in | std::ios::out | std::ios::app);
-
+    
     if (!novoArquivo->is_open()) {
         std::cerr << "FileManager::loadFile::Problema ao abrir o arquivo: " << filename << '\n';
         delete novoArquivo;
