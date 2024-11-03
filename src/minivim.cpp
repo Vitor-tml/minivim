@@ -1,21 +1,24 @@
 #include "minivim.hpp"
 #define UNTITLENAME "untitled.gli"
 
-Minivim::Minivim(std::string &filename){
+Minivim::Minivim(std::string &f){
     initscr();
     noecho();
     cbreak();
     keypad(stdscr, true);
-
+    use_default_colors();
     x = y = 0;
     mode = 'n';
     status = "NORMAL";
+    section = "";
     gArquivos = FileManager::getInstance();
+    filename = f;
     if(filename.empty())
     {
         filename = UNTITLENAME; 
     }
     
+
     gArquivos->loadFile(filename);
     file = gArquivos->getFile(filename);
 
@@ -52,12 +55,28 @@ void Minivim::update()
     case 'q':
         break;
     };
+    section = " COLS: " + std::to_string(x) + " | ROWS: " + std::to_string(y) + " | Arquivo: " + filename;
+    status.insert(0, " ");
 }
 
 void Minivim::statusLine()
 {
+    start_color();
+    if(mode == 'n'){
+        init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
+    }else {
+        init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    }
     attron(A_REVERSE);
+    attron(A_BOLD);
+    attron(COLOR_PAIR(1));
+    for(int i {}; i < COLS; i++){
+        mvprintw(LINES - 1, i, " ");
+    }
     mvprintw((int)LINES - 1, 0, status.c_str());
+    mvprintw(LINES - 1, COLS - section.length(), &section[0]);
+    attroff(A_BOLD);
+    attroff(COLOR_PAIR(1));
     attroff(A_REVERSE);
 }
 
@@ -212,7 +231,7 @@ void Minivim::right()
 void Minivim::down()
 {
     if( y < LINES && y < lines.size() - 1){
-        --y;
+        ++y;
 
     }
     if( x >= lines[y].length()){

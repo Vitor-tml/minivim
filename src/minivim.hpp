@@ -12,7 +12,7 @@ private:
     std::vector<std::string> lines;
     size_t x, y;
     char mode;
-    std::string status;
+    std::string filename, status, section, nomeArquivo;
 
     void m_remove(int);
     std::string m_tabs(std::string &);
