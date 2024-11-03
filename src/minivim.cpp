@@ -17,6 +17,8 @@ Minivim::Minivim(std::string &f){
 
     gArquivos->loadFile(filename);
     file = gArquivos->getFile(filename);
+    
+    curs_set(1);  // Garanta que o cursor seja exibido
 }
 
 Minivim::~Minivim()
@@ -32,8 +34,12 @@ void Minivim::run(){
         int c = getch();
         input(c);
         print();
+        
+        move(y, x);  // Atualize a posição do cursor
+        refresh();   // Atualize a tela
     }
 }
+
 
 void Minivim::update()
 {
@@ -72,7 +78,11 @@ void Minivim::statusLine()
     attroff(A_BOLD);
     attroff(COLOR_PAIR(1));
     attroff(A_REVERSE);
+    
+    move(y, x);  // Atualize a posição do cursor
+    refresh();   // Atualize a tela
 }
+
 
 void Minivim::input(int c)
 {
@@ -177,8 +187,10 @@ void Minivim::print()
             clrtoeol();
         }
     }
-    move(y, x);
+    move(y, x);  // Mantenha a posição do cursor
+    refresh();   // Atualize a tela
 }
+
 
 std::string Minivim::m_tabs(std::string& line)
 {
@@ -200,7 +212,6 @@ void Minivim::m_append(std::string& line)
     line = m_tabs(line);
     lines.push_back(line);
 }
-
 void Minivim::up()
 {
     if( y > 0 ){
@@ -209,33 +220,36 @@ void Minivim::up()
     if(x >= lines[y].length()){
         x = lines[y].length();
     }
-    move(y, x);
+    move(y, x);  // Atualize a posição do cursor
 }
+
 void Minivim::left()
 {
     if( x > 0 ){
         x--;
-        move(y, x);
+        move(y, x);  // Atualize a posição do cursor
     }
 }
+
 void Minivim::right()
 {
     if(x <= COLS && x <= lines[y].length() - 1){
         ++x;
-        move(y, x);
+        move(y, x);  // Atualize a posição do cursor
     }
 }
+
 void Minivim::down()
 {
     if( y < LINES && y < lines.size() - 1){
         ++y;
-
     }
     if( x >= lines[y].length()){
         x = lines[y].length();
     }
-    move(y, x);
+    move(y, x);  // Atualize a posição do cursor
 }
+
 
 void Minivim::loadBuffer(std::string id)
 {
