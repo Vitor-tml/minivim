@@ -27,7 +27,7 @@ Minivim::~Minivim()
     endwin();
 }
 
-void Minivim::run()
+void Minivim::run() 
 {
     while (mode != 'q')
     {
