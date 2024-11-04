@@ -7,6 +7,3 @@ Esse projeto parte da idéia que eu tive sobre como seria o editor de texto de t
 * CMake
 * Make
 * Fé
-
-# Tutorial
-Já faço, pera ai.

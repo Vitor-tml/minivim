@@ -31,13 +31,14 @@ void Minivim::run()
 {
     while (mode != 'q')
     {
+        print();
         update();
         statusLine();
         int c = getch();
         input(c);
-        print();
 
-        move(y, x);  
+        // Mova o cursor para a posição correta, levando em conta as bordas
+        move(y + 1, x + 1);  
         refresh();  // Atualize a tela
     }
 }
@@ -48,43 +49,27 @@ void Minivim::update()
     {
     case 27:
     case 'n':
-        status = "NORMAL";
+        status = "NORMAL ";
         break;
     case 'i':
-        status = "INSERT";
+        status = "INSERT ";
         break;
     case 'q':
         break;
     };
-    section = " COLS: " + std::to_string(x) + " | ROWS: " + std::to_string(y) + " | Arquivo: " + filename;
+    section = " COLS: " + std::to_string(x) + " | ROWS: " + std::to_string(y) + " | Arquivo: " + filename + " ";
     status.insert(0, " ");
 }
 
 void Minivim::statusLine()
 {
-    start_color();
-    if (mode == 'n')
-    {
-        init_pair(1, COLOR_MAGENTA, COLOR_BLACK);
+    for (int i = 1; i < COLS - 1; i++){
+        mvaddch(LINES - 1, i, ACS_HLINE);
     }
-    else
-    {
-        init_pair(1, COLOR_GREEN, COLOR_BLACK);
-    }
-    attron(A_REVERSE);
-    attron(A_BOLD);
-    attron(COLOR_PAIR(1));
-    for (int i{}; i < COLS; i++)
-    {
-        mvprintw(LINES - 1, i, " ");
-    }
-    mvprintw((int)LINES - 1, 0, status.c_str());
-    mvprintw(LINES - 1, COLS - section.length(), &section[0]);
-    attroff(A_BOLD);
-    attroff(COLOR_PAIR(1));
-    attroff(A_REVERSE);
+    mvprintw((int)LINES - 1, 2, status.c_str());
+    mvprintw(LINES - 1, COLS - 2 - section.length(), &section[0]);
 
-    move(y, x);  
+    move(y + 1, x + 1);  
     refresh();  // Atualize a tela
 }
 
@@ -118,25 +103,52 @@ void Minivim::input(int c)
         insertMode(c);
     };
 }
-
 void Minivim::print()
 {
-    for (size_t i{}; i < (size_t)LINES - 1; ++i)
+    // Desenhar o conteúdo do editor dentro da caixa
+    for (size_t i = 0; i < (size_t)LINES - 2; ++i)
     {
         if (i >= lines.size())
         {
-            move(i, 0);
+            move(i + 1, 2); // Mover um para baixo devido à borda
             clrtoeol();
         }
         else
         {
-            mvprintw(i, 0, lines[i].c_str());
+            mvprintw(i + 1, 1, lines[i].c_str()); // Mover para a direita
             clrtoeol();
         }
     }
-    move(y, x); // Mantenha a posição do cursor
-    refresh();  // Atualize a tela
+
+    // Desenhar a borda
+    for (size_t i = 0; i < (size_t)LINES - 1; ++i)
+    {
+        for (size_t j = 0; j < (size_t)COLS; ++j)
+        {
+            if (i == 0 || i == LINES - 1) // Linhas superior e inferior
+            {
+                mvaddch(i, j, ACS_HLINE);
+            }
+            if (j == 0 || j == COLS - 1) // Coluna esquerda e direita
+            {
+                mvaddch(i, j, ACS_VLINE);
+            }
+        }
+    }
+
+    // Desenhar os cantos da caixa
+    mvaddch(0, 0, ACS_ULCORNER);           // Canto superior esquerdo
+    mvaddch(0, COLS - 1, ACS_URCORNER);    // Canto superior direito
+    mvaddch(LINES - 1, 0, ACS_LLCORNER);   // Canto inferior esquerdo
+    mvaddch(LINES - 1, COLS - 1, ACS_LRCORNER); // Canto inferior direito
+
+    // Ajustar a posição do cursor para dentro da caixa
+    move(y + 1, x + 1); // Adiciona 1 para compensar a borda
+    refresh();          // Atualize a tela
 }
+
+
+// O restante da classe permanece inalterado
 
 std::string Minivim::m_tabs(std::string &line)
 {
@@ -158,6 +170,7 @@ void Minivim::m_append(std::string &line)
     line = m_tabs(line);
     lines.push_back(line);
 }
+
 void Minivim::up()
 {
     if (y > 0)
@@ -168,7 +181,7 @@ void Minivim::up()
     {
         x = lines[y].length();
     }
-    move(y, x);  
+    move(y + 1, x + 1);  // Ajustar para a posição correta na caixa
 }
 
 void Minivim::left()
@@ -176,22 +189,22 @@ void Minivim::left()
     if (x > 0)
     {
         x--;
-        move(y, x);  
+        move(y + 1, x + 1);  // Ajustar para a posição correta na caixa
     }
 }
 
 void Minivim::right()
 {
-    if (x <= COLS && x <= lines[y].length() - 1)
+    if (x < lines[y].length())
     {
         ++x;
-        move(y, x);  
+        move(y + 1, x + 1);  // Ajustar para a posição correta na caixa
     }
 }
 
 void Minivim::down()
 {
-    if (y < LINES && y < lines.size() - 1)
+    if (y < lines.size() - 1)
     {
         ++y;
     }
@@ -199,7 +212,7 @@ void Minivim::down()
     {
         x = lines[y].length();
     }
-    move(y, x);  
+    move(y + 1, x + 1);  // Ajustar para a posição correta na caixa
 }
 
 void Minivim::loadBuffer(std::string id)
