@@ -9,4 +9,4 @@ Esse projeto parte da idéia que eu tive sobre como seria o editor de texto de t
 * Fé
 
 # Resultado
-[resultado](https://github.com/Vitor-tml/vitor-tml/blob/main/minivim.png?raw=true)
+![Resultado](https://github.com/Vitor-tml/vitor-tml/blob/main/minivim.png?raw=true)
