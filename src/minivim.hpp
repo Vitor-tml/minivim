@@ -35,4 +35,6 @@ protected:
     void right();
     void down();
 
+    void normalMode(int);
+    void insertMode(int);
 };
